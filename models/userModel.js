@@ -1,6 +1,7 @@
 const { createHmac, randomBytes } = require("node:crypto");
 
 const { Schema, model } = require("mongoose");
+const { createUserToken } = require("../services/auth");
 
 const userSchema = new Schema(
   {
@@ -49,21 +50,25 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-userSchema.static("matchPassword", async function (email, password) {
-  const user = await this.findOne({ email });
-  if (!user) throw new Error("User doesn't exist!");
+userSchema.static(
+  "matchPasswordAndCreateToken",
+  async function (email, password) {
+    const user = await this.findOne({ email });
+    if (!user) throw new Error("User doesn't exist!");
 
-  const salt = user.salt;
-  const hashedPswd = user.password;
+    const salt = user.salt;
+    const hashedPswd = user.password;
 
-  const userProvidedHash = createHmac("sha256", salt)
-    .update(password)
-    .digest("hex");
+    const userProvidedHash = createHmac("sha256", salt)
+      .update(password)
+      .digest("hex");
 
-  if (hashedPswd !== userProvidedHash) throw new Error("Incorrect Password");
+    if (hashedPswd !== userProvidedHash) throw new Error("Incorrect Password");
 
-  return user;
-});
+    const token = createUserToken(user);
+    return token;
+  }
+);
 
 const User = model("user", userSchema);
 
