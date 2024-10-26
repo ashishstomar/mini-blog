@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head') %>
+    <title><%- blog.title %> - Blog Post</title>
+  </head>
+  <body>
+    <%- include('./partials/nav') %>
+
+    <div class="container-fluid py-5">
+      <div class="container">
+        <h1 class="display-4 fw-bold mb-4 text-primary"><%- blog.title %></h1>
+        <div class="d-flex align-items-center mb-4">
+          <img
+            src="<%- blog.createdBy.profileImageUrl %>"
+            alt="<%- blog.createdBy.fullName %>'s profile image"
+            class="rounded-circle me-2"
+            style="width: 45px; height: 45px; object-fit: cover"
+          />
+          <div>
+            <p class="mb-0 fw-semibold"><%- blog.createdBy.fullName %></p>
+            <small class="text-muted"
+              >Published on: <%- new Date(blog.createdAt).toLocaleDateString()
+              %></small
+            >
+          </div>
+        </div>
+        <img
+          src="<%- blog.coverImageURL %>"
+          class="img-fluid rounded mb-4"
+          alt="<%- blog.title %> cover image"
+          style="max-height: 500px; object-fit: cover"
+        />
+        <article class="mb-5" style="white-space: pre-wrap">
+          <p class="fs-5 text-secondary"><%- blog.body %></p>
+        </article>
+
+        <section class="comments">
+          <h2 class="h4 mb-4">Comments (<%= comments.length %>)</h2>
+          <% if (locals.user) { %>
+          <form
+            class="mb-4"
+            action="/blog/comment/<%= blog._id %>"
+            method="POST"
+          >
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                name="content"
+                placeholder="Add a comment..."
+                aria-label="Add a comment"
+              />
+              <button class="btn btn-primary" type="submit">Add</button>
+            </div>
+          </form>
+          <% } %> <% comments.forEach(comment => { %>
+          <div class="d-flex mb-3">
+            <img
+              src="<%= comment.createdBy.profileImageUrl %>"
+              alt="<%= comment.createdBy.fullName %>'s profile image"
+              class="rounded-circle me-2"
+              style="width: 40px; height: 40px; object-fit: cover"
+            />
+            <div class="bg-light p-3 rounded flex-fill">
+              <p class="mb-1 fw-bold"><%- comment.createdBy.fullName %></p>
+              <p class="mb-0" style="white-space: pre-wrap">
+                <%= comment.content %>
+              </p>
+            </div>
+          </div>
+          <% }) %>
+        </section>
+      </div>
+    </div>
+
+    <%- include('./partials/script') %>
+  </body>
+</html>
