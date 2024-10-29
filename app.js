@@ -12,7 +12,7 @@ const Blog = require("./models/blogModel");
 const app = express();
 
 mongoose
-  .connect(process.env.MongoURL)
+  .connect(process.env.MONGO_URL)
   .then((e) => console.log("MongoDB Connected"));
 
 app.set("view engine", "ejs");
